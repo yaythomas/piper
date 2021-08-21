@@ -1,0 +1,34 @@
+# ./pipeline-dir/my-pipe.yaml
+context_parser: pypyr.parser.keyvaluepairs
+steps:
+  - name: pypyr.steps.contextsetf
+    in:
+      contextSetf:
+        progress: 0
+        finished: False
+  - name: pypyr.steps.echo
+    in:
+      echoMe: piper {arbkey} that {anotherkey} again
+      progress: !py progress = progress + 1
+  - name: pypyr.steps.cmd
+    in:
+      cmd: 'sleep 10'
+      progress: !py progress = progress + 1
+  - name: pypyr.steps.contextsetf
+    in:
+      progress: !py progress = progress + 1
+      contextSetf:
+        myoutput: I was set in the pipeline!
+        input_values:
+          - '{arbkey}'
+          - '{anotherkey}'
+        some_nesting:
+          down_level:
+            arb_number: 123
+            arb_bool: False
+
+on_success:
+  - name: pypyr.steps.contextsetf
+    in:
+      contextSetf:
+        finished: True
