@@ -1,27 +1,28 @@
 # ./pipeline-dir/my-pipe.yaml
 context_parser: pypyr.parser.keyvaluepairs
 steps:
-  - name: pypyr.steps.contextsetf
+  - name: pypyr.steps.py
+    comment: define a function to incremenet context progress in run dectorators.
     in:
-      contextSetf:
-        progress: 0
-        finished: False
+      pycode: |
+        # add one for this task
+        context['progress'] += 1
+
+        def increase_progress():
+          context['progress'] += 1
+          return context['progress']
+
+        context['increase_progress'] = increase_progress
+  
   - name: pypyr.steps.echo
+    run: !py increase_progress()
     in:
       echoMe: piper {arbkey} that {anotherkey} again
-      progress: !py progress = progress + 1
-  - name: pypyr.steps.cmd
-    in:
-      cmd: 'sleep 10'
-      progress: !py progress = progress + 1
   - name: pypyr.steps.contextsetf
+    run: !py increase_progress()
     in:
-      progress: !py progress = progress + 1
       contextSetf:
         myoutput: I was set in the pipeline!
-        input_values:
-          - '{arbkey}'
-          - '{anotherkey}'
         some_nesting:
           down_level:
             arb_number: 123
