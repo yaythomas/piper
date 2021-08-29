@@ -2,30 +2,33 @@
 context_parser: pypyr.parser.keyvaluepairs
 steps:
   - name: pypyr.steps.py
-    comment: define a function to incremenet context progress in run dectorators.
+    comment: Print 'hi from python' from python
     in:
       pycode: |
-        # add one for this task
-        context['progress'] += 1
-
-        def increase_progress():
-          context['progress'] += 1
-          return context['progress']
-
-        context['increase_progress'] = increase_progress
+        print('hi from python')
   
-  - name: pypyr.steps.echo
-    run: !py increase_progress()
+  - name: pypyr.steps.py
+    comment: Use python to sleep for 2 seconds
     in:
-      echoMe: piper {arbkey} that {anotherkey} again
+      py: |
+        import time
+
+        time.sleep(2)
+  - name: pypyr.steps.cmd
+    comment: Run an nmap scan using the cmd step
+    in:
+      cmd: 
+        run: nmap.exe -T4 scanme.nmap.org
+        save: True
   - name: pypyr.steps.contextsetf
-    run: !py increase_progress()
+    comment: Set some stuff in the context
     in:
       contextSetf:
         myoutput: I was set in the pipeline!
         some_nesting:
           down_level:
             arb_number: 123
+            foo: !py 1 == 1
             arb_bool: False
 
 on_success:
