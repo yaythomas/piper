@@ -2,6 +2,9 @@
 context_parser: pypyr.parser.keyvaluepairs
 steps:
   - name: pypyr.steps.py
+    comment: |
+      Open a newlined delimited hosts file and store it
+      in the context object as a comma delimited list for rustscan.
     in:
       py: |
         hosts = ','.join(open('./hosts.txt').read().splitlines())
@@ -9,16 +12,9 @@ steps:
         logger(hosts)
         save('hosts')
 
-  #- name: pypyr.steps.cmd
-  #  comment: rustscan 
-  #  run: False
-  #  in:
-  #    cmd: 
-  #      run: docker run -it --rm --name rustscan rustscan/rustscan --accessible --greppable -a {hosts} 
-  #      save: True
-
   - name: piper.steps.rustscan
     comment: run custom rustscan step!
+    run: False
     in:
       docker: True
       persist: True

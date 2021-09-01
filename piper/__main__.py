@@ -49,9 +49,6 @@ def pipeline_thread_function(shared_context):
         parse_input=False
         )   
 
-# Shared context object used by the main thread here (for reads)
-# and by the pipeline itself in a separate thread (for reads and writes)
-# no locking here because idgaf.
 shared_context = context.Context({
     'finished': False,
     'progress': 0, 
@@ -60,8 +57,7 @@ shared_context = context.Context({
     'logger': console.log,
     'db': db
 }) 
-#pipeline_thread = threading.Thread(target=pipeline_thread_function, args=(shared_context,))
-#pipeline_thread.start()
+
 pipeline_definition = fileloader.get_pipeline_definition('pipelines/test-pipe', Path(os.getcwd()))
 stepsrunner = StepsRunner(pipeline_definition, shared_context) 
 steps = stepsrunner.get_pipeline_steps('steps')
@@ -69,8 +65,9 @@ step_count = 0
 
 with console.status('[bold green]Hacking stuff...', spinner='pong'):
     for step in steps:
+        console.log(f"[bold magenta]{step.get('name').upper()}:")
         if step.get('comment', None):
-            console.log(step.get('comment'))
+            console.log(f"[cyan]{step.get('comment')}")
 
         step_instance = Step(step, stepsrunner)
         step_instance.run_step(shared_context)
@@ -80,19 +77,7 @@ with console.status('[bold green]Hacking stuff...', spinner='pong'):
             shared_context['cmdOut'] = ''
             console.log(cmd_out['stdout'])
 
-            #if step.get('comment', None) and step['comment'] == 'rustscan':
-            #    stdout_split = cmd_out['stdout'].split('\n')
-            #    
-            #    for h in stdout_split:
-            #        db.table(step['comment']).insert({
-            #            h.split()[0]: {
-            #                'ports': ast.literal_eval(h.split()[2])
-            #            }
-            #        })
-
-        console.log(f'{step["name"]} compelete')
+        console.log(f':white_check_mark: [green]{step["name"]} compelete\n')
         step_count += 1
 
-console.print('')
-console.log(':smiley: done')
-#pipeline_thread.join()
+console.log(':smiley: [bold green]done[/bold green] :confetti_ball:')
