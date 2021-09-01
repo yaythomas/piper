@@ -19,6 +19,22 @@ from rich import inspect
 from rich.logging import RichHandler
 from rich import print
 
+from tinydb import TinyDB, Query
+
+import ast
+
+# TODO: allow the user to specify / select a DB file to 
+# use for a given pipeline
+db = TinyDB('./db.json')
+
+host = {
+    'ip': '',
+    'hostname': '',
+    'steps': {},
+    'services': {},
+    'last_seen': ''
+}
+
 FORMAT = "%(message)s"
 logging.basicConfig(
     level=25, format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
@@ -40,7 +56,9 @@ shared_context = context.Context({
     'finished': False,
     'progress': 0, 
     'arbkey':'pipe', 
-    'anotherkey':'song'
+    'anotherkey':'song',
+    'logger': console.log,
+    'db': db
 }) 
 #pipeline_thread = threading.Thread(target=pipeline_thread_function, args=(shared_context,))
 #pipeline_thread.start()
@@ -61,6 +79,16 @@ with console.status('[bold green]Hacking stuff...', spinner='pong'):
             cmd_out = shared_context.get('cmdOut')
             shared_context['cmdOut'] = ''
             console.log(cmd_out['stdout'])
+
+            #if step.get('comment', None) and step['comment'] == 'rustscan':
+            #    stdout_split = cmd_out['stdout'].split('\n')
+            #    
+            #    for h in stdout_split:
+            #        db.table(step['comment']).insert({
+            #            h.split()[0]: {
+            #                'ports': ast.literal_eval(h.split()[2])
+            #            }
+            #        })
 
         console.log(f'{step["name"]} compelete')
         step_count += 1
